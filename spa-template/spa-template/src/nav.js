@@ -20,8 +20,8 @@ export const Nav = () => {
 
       })
 
-      let links = document.querySelectorAll('li')
-      console.log(links)
+      //let links = document.querySelectorAll('li')
+      //console.log(links)
 
     return (
         <div id="navigation-container" className="navigation-container">

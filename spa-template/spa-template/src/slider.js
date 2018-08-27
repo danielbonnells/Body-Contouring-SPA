@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Slide } from './slide'
 import { TextBlock } from './textblock'
 import {SlideControl } from './slide-control'
+
 export class Slider extends Component {
 
     constructor(props){
@@ -9,47 +10,55 @@ export class Slider extends Component {
 
         this.state = {
             currentSlide: 0,
-            previousSlide: 0,
+            clickedSlides: [],
             slides: [0,1,2],
-            auto: false
+            auto: true // true means the slider will move on its own when the page loads
         }
     }
 
     changeSlides = (slideId) => {
 
+        
         let currentSlide //the index 
-
-        let previousSlide = this.state.previousSlide
-
         let current //the elements
         let next
         let previous
 
-        if(slideId){
+        if(!isNaN(slideId)){ //if slideID is a number, including zero
+            
             currentSlide = slideId
 
             this.setState(() => ({
-                previousSlide: this.state.currentSlide,
-                currentSlide: slideId
+                currentSlide: currentSlide,
+                auto: false
             }))
-
+        
             current = document.getElementById(currentSlide)
-            previous = document.getElementById(previousSlide)
+            
+            let slides = Array.from(document.getElementsByClassName('slide'))
+                    
+            slides.map(slide => {
+                slide.classList.remove('slide-current', 'slide-next', 'slide-visibility')
+                
+            })
 
-            if(previous == current){
-                console.log('same same')
+            if(slideId == this.state.currentSlide && this.state.clickedSlides.length > 2){
+                //console.log('same same')
+                this.styleControl(slideId)
+                current.classList.add('slide-current')
                 return null
             } else{
-                console.log(previous, current)
-                previous.classList.remove('slide-current', 'slide-next')
-                previous.classList.add('slide-visibility')
-                //the current slide gets moved to the center/current position
-                current.classList.remove('slide-next', 'slide-visibility')
+                this.styleControl(slideId)
                 current.classList.add('slide-current')
             }
-        } else {
-            currentSlide = this.state.currentSlide
+            
+        } else if(this.state.auto){
 
+            //console.log("Slides on Auto Rotation")
+            
+
+            currentSlide = this.state.currentSlide
+            this.styleControl(currentSlide)
             //if currentSlide == last item in the slides array
             if(currentSlide == this.state.slides[this.state.slides.length - 1]){ 
                 next = document.getElementById(this.state.slides[0])
@@ -64,48 +73,84 @@ export class Slider extends Component {
 
             current = document.getElementById(currentSlide)
 
-               //previous slide
-                //setTimeout(() => previous.classList.add('slide-visibility'), 500)
-                previous.classList.remove('slide-current', 'slide-next')
-                previous.classList.add('slide-visibility')
-                //the current slide gets moved to the center/current position
-                current.classList.remove('slide-next', 'slide-visibility')
-                current.classList.add('slide-current')
-                //next slide gets current position
-                next.classList.remove('slide-current', 'slide-visibility')
-                next.classList.add('slide-next')
+            //previous slide
+            //setTimeout(() => previous.classList.add('slide-visibility'), 500)
+            previous.classList.remove('slide-current', 'slide-next')
+            previous.classList.add('slide-visibility')
+            //the current slide gets moved to the center/current position
+            current.classList.remove('slide-next', 'slide-visibility')
+            current.classList.add('slide-current')
+            //next slide gets current position
+            next.classList.remove('slide-current', 'slide-visibility')
+            next.classList.add('slide-next')
 
+            // only matters if we have auto === true
+            if(currentSlide == this.state.slides[this.state.slides.length - 1]){
+                this.setState({
+                    currentSlide: 0
+                })
+            }
+            else {
+                this.setState((prevState) => ({
+                    currentSlide: prevState.currentSlide + 1
+                }))
+            }
         }
-
-        
-       
-     
-        
-        // only matters if we have auto === true
-        if(currentSlide == this.state.slides[this.state.slides.length - 1]){
-            this.setState({
-                currentSlide: 0
-            })
-         }
-        else {
-            this.setState((prevState) => ({
-                currentSlide: prevState.currentSlide + 1
-            }))
-        }
-        console.log('current state slide ' + this.state.currentSlide)
+        // iterates the function 
        if(this.state.auto){
-        setTimeout(this.changeSlides, 3000)
+        setTimeout(this.changeSlides, 5000)
        }
         
     }
 
     goToSlide = (slideId) => {
-        console.log('slide selected ' + slideId)
+
+
+        let arr = this.state.clickedSlides
+
+        if(slideId != this.state.clickedSlides[this.state.clickedSlides.length - 1]){
+            arr.push(slideId)
+        }
+
+        this.setState({
+            clickedSlides: arr
+        })
+
+        //console.log(arr)
+
         this.changeSlides(slideId)
     }
 
+    styleControl = (id) => {
+        //console.log(id)
+        const currentSlide = id
+     
+        let controls = Array.from(document.querySelectorAll('.slide-control[slideid]'))
+
+        controls.map(control => {
+            if(control.getAttribute("slideid") == currentSlide){
+                
+                control.classList.add('slide-control-active')
+            } else {
+                
+                control.classList.remove('slide-control-active')
+            }
+        })
+
+
+    }
+
+    componentDidMount(){
+        this.changeSlides()
+    }
+
+    // future features
+    //--- keyboard functionality by listening to arrow keys and calling goToSlide with this.state.currentSlide as the parameter
+    //--- aria labels/controls
+  
+
     render(){
-        
+
         const images = [
             {
                 id: 0,
@@ -130,13 +175,12 @@ export class Slider extends Component {
         const slides = images.map((image) => {
             return (
                         <Slide source={image.source} id={image.id} alt={image.alt} key={image.id}/>
-                   
                 )
         })   
 
         const slideControls = images.map((image) => {
             return(
-                <SlideControl targetSlide={image.id} goToSlide={this.goToSlide} />
+                <SlideControl targetSlide={image.id} goToSlide={this.goToSlide} key={image.id} />
             )
         })
 

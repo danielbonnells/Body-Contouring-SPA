@@ -67,13 +67,26 @@
 
 .slide-container{
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 100px 1fr 1fr 100px 1fr 1fr 100px;
   grid-template-areas:
-  'slides slides textblock textblock'
-  'slidecontrols slidecontrols textblock textblock';
-  margin-top: 100px;
-  width: 500px;
+  '. slides slides . textblock textblock .'
+  '. slidecontrols slidecontrols . textblock textblock .';
+  margin-top: 200px;
   overflow: hidden;
+}
+
+@media screen and (max-width: 700px){
+  .slide-container{
+    display: grid;
+    column-count: 1;
+    grid-template-areas:
+    '. slides slides slides slides slides .'
+    '. slidecontrols slidecontrols slidecontrols slidecontrols slidecontrols .' 
+    '. textblock textblock textblock textblock textblock .';
+    margin-top: 200px;
+    overflow: hidden;
+  }
+  
 }
 
 .slide{
@@ -92,26 +105,56 @@
   grid-area: slides;
   position: relative;
   overflow: hidden;
+  height: 300px;
+  
 }
 .slide-controls{
   position: relative;
   grid-area: slidecontrols;
+  text-align: center;
 }
 .slide-control{
   display: inline-block;
-  width: 10px; 
-  height:10px; 
-  background:red;
-  margin-right: 20px;
+  border: none;
+  width: 30px; 
+  height: 4px; 
+  background:#ff7bbb;
+  margin: 10px 20px;
+  cursor: pointer;
+  transition: background .5s ease;
 }
+.slide-control:hover{
+  background: #c62271;
+}
+
+.slide-control-active{
+  background: #c62271;
+}
+
 .home-text-container{
   grid-area: textblock;
-  /* position: absolute;  */
-  /* top: 20%;
-  left: 50%; */
+  position: relative;
+}
+.cta-home{
+  width: 80%;
+  position: absolute;
+  bottom: 25px;
+  background: white;
+  border: 4px solid #ff7bbb;
+}
+.cta{
+  font-size: 1.5em;
+  font-weight: 700;
+  padding: 10px;
+  transition: background .5s ease;
+  cursor: pointer;
+}
+
+.cta:hover{
+  background: #c62271;
+  color: white;
 }
 .slide-visibility {
-  
   display: none;
   visibility: hidden;
 }
@@ -123,4 +166,47 @@
 }
 .slide-previous{
   left: -100%;
+}
+
+.services-container{
+  text-align: center;
+  display: grid;
+  grid-template-columns: repeat(1fr, 4);
+  grid-template-areas: 
+  '. services-title services-title .'
+  '. left-services right-services .'
+  '. services-btn-container services-btn-container . ';
+  
+}
+.services-title{
+  grid-area: services-title;
+  padding: 50px 0px 0px 0px;
+  
+}
+.services-list{
+  padding: 30px;
+
+}
+.services-list ul{
+  list-style: none;
+  margin: 20px 0px;
+  padding: 0px;
+}
+.left-services{
+  grid-area: left-services;
+}
+.right-services{
+  grid-area: right-services;
+}
+
+.services-btn-container{
+  grid-area: services-btn-container;
+}
+
+.cta-services{
+  width: 50%;
+  background: white;
+  border: 4px solid #ff7bbb;
+  /* margin-left: 25%; */
+  margin-top: 2em;
 }
